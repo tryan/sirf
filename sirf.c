@@ -156,10 +156,12 @@ main(int argc, char **argv)
     (void)argc;
     (void)argv;
 
-    uint8_t mid41[91];
-    for (int i = 0; i < 91; i++) { mid41[i] = (uint8_t)i; }
-    mid41[0] = 41;
-    handle_message(mid41);
+    uint8_t msg[1024];
+    for (unsigned i = 0; i < sizeof(msg); i++) { msg[i] = i & 0xFF; }
+    msg[0] = 41;
+    handle_message(msg);
+    msg[0] = 66;
+    handle_message(msg);
 
 #define SHOW(name, size, offset) printf(#name " = %08X\n", data.name);
     MID41_FIELDS(SHOW);
