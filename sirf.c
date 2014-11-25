@@ -93,13 +93,13 @@ static const struct field mid66_fields[] = {
 static void
 update_gps_data(
     struct gps_data *data,
-    uint8_t *msg,
+    uint8_t *payload,
     const struct field *fields,
     size_t nfields)
 {
     for (unsigned i = 0; i < nfields; i++) {
         const struct field *f = &(fields[i]);
-        uint8_t *b = msg + f->payload_offset;
+        uint8_t *b = payload + f->payload_offset;
         uint8_t *dest = (uint8_t *)data + f->struct_offset;
         switch (f->size) {
         case 1:
@@ -118,12 +118,12 @@ update_gps_data(
     }
 }
 
-static void handle_mid6(uint8_t *msg)
+static void handle_mid6(uint8_t *payload)
 {
     // Version strings are 81 bytes max (including NUL)
     static const unsigned N = 81;
 
-    char *sirf = (char *)msg;
+    char *sirf = (char *)payload;
     char *nul = memchr(sirf, '\0', N);
     if (nul == NULL) {
         // Message appears to be malformed
@@ -136,15 +136,16 @@ static void handle_mid6(uint8_t *msg)
 static void handle_message(uint8_t *msg)
 {
     uint8_t mid = msg[0];
+    uint8_t *payload = &(msg[1]);
     switch (mid) {
     case 41:
-        update_gps_data(&data, msg + 1, mid41_fields, ARRAY_LEN(mid41_fields));
+        update_gps_data(&data, payload, mid41_fields, ARRAY_LEN(mid41_fields));
         break;
     case 66:
-        update_gps_data(&data, msg + 1, mid66_fields, ARRAY_LEN(mid66_fields));
+        update_gps_data(&data, payload, mid66_fields, ARRAY_LEN(mid66_fields));
         break;
     case 6:
-        handle_mid6(msg + 1);
+        handle_mid6(payload);
         break;
     }
 }
@@ -162,6 +163,7 @@ main(int argc, char **argv)
 
 #define SHOW(name, size, offset) printf(#name " = %08X\n", data.name);
     MID41_FIELDS(SHOW);
+    MID66_FIELDS(SHOW);
 
     return 0;
 }
