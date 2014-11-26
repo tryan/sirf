@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
+#include <limits.h>
 
 #define ARRAY_LEN(arr) (sizeof(arr) / sizeof(arr[0]))
 
@@ -147,6 +148,53 @@ static void handle_message(uint8_t *msg)
         handle_mid6(payload);
         break;
     }
+}
+
+static size_t scan_bytes(uint8_t *buf, size_t n)
+{
+    if (n < 10) {
+        return 0;
+    }
+
+    unsigned d, start = UINT_MAX;
+    for (d = 0; d < (n - 10); d++) {
+        if (buf[d] == 0xA0 && buf[1] == 0xA2) {
+            start = d;
+            break;
+        }
+    }
+
+    if (start == UINT_MAX) {
+        return d;
+    }
+
+    uint8_t *frame = &(buf[start]);
+    unsigned len = ((unsigned)frame[2] << 8) | frame[3];
+    unsigned last = start + len + 7;
+    if (len >= 2048) {
+        // Not a valid frame header
+        return d + 2;
+    } else if (last >= n) {
+        // Don't have the full frame yet
+        return d;
+    }
+
+    if (frame[last - 1] != 0xB0 || frame[last] != 0xB3) {
+        return d + 2;
+    }
+
+    unsigned sum = 0;
+    for (unsigned i = 4; i <= (last - 4); i++) {
+        sum += frame[i];
+    }
+    unsigned recv_xsum = ((unsigned)frame[last - 3] << 8) | frame[last - 2];
+    if ((sum & 0xFFFF) != recv_xsum) {
+        return d + 2;
+    }
+
+    handle_message( &(frame[4]) );
+
+    return last + 1;
 }
 
 int
