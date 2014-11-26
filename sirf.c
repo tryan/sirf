@@ -7,8 +7,8 @@
 
 /*
  * Multibyte values are transmitted big-endian in SiRF. SiRF single and double
- * are IEEE 754 formatted, so no extra byte reordering/interpretation is needed
- * if native floats and doubles are also IEEE 754.
+ * are IEEE 754 binary32/binary64 formatted. It is assumed that the platform
+ * also uses this format, so no additional processing is applied.
  */
 
 static void
@@ -119,7 +119,7 @@ update_gps_data(
 
 static void handle_mid6(uint8_t *payload)
 {
-    // Version strings are 81 bytes max (including NUL)
+    // Version strings are 81 bytes max including NUL
     static const unsigned N = 81;
 
     char *sirf = (char *)payload;
