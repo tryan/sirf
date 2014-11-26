@@ -6,6 +6,14 @@
 
 #define ARRAY_LEN(arr) (sizeof(arr) / sizeof(arr[0]))
 
+#ifdef NDEBUG
+#define dbg_puts(...)
+#define dbg_printf(...)
+#else
+#define dbg_puts        puts
+#define dbg_printf      printf
+#endif
+
 /*
  * Multibyte values are transmitted big-endian in SiRF. SiRF single and double
  * are IEEE 754 binary32/binary64 formatted. It is assumed that the platform
@@ -140,9 +148,12 @@ static void handle_message(uint8_t *msg)
     switch (mid) {
     case 41:
         update_gps_data(&data, payload, mid41_fields, ARRAY_LEN(mid41_fields));
+        dbg_printf("(%f, %f)\n",
+            (double)data.latitude * 1e-7, (double)data.longitude * 1e-7);
         break;
     case 66:
         update_gps_data(&data, payload, mid66_fields, ARRAY_LEN(mid66_fields));
+        dbg_printf("pdop=%u,hdop=%u,vdop=%u\n", data.pdop, data.hdop, data.vdop);
         break;
     case 6:
         handle_mid6(payload);
@@ -197,22 +208,42 @@ static size_t scan_bytes(uint8_t *buf, size_t n)
     return last + 1;
 }
 
+#include <unistd.h>
+
+static void test_from_stdin(void)
+{
+    const unsigned N = 2000;
+    uint8_t buf[N];
+    size_t n = 0;
+    for (;;) {
+        n += read(STDIN_FILENO, &(buf[n]), N - n);
+        dbg_printf("\nread %lu bytes\n", n);
+        if (n < 10) {
+            break;
+        }
+
+        // Process all the fully received messages
+        size_t d = 0, dd;
+        do {
+            dd = scan_bytes( &(buf[d]), n - d );
+            d += dd;
+        } while (dd > 0);
+        dbg_printf("processed %lu bytes\n", d);
+        // (log and) discard processed bytes
+        memmove(buf, &(buf[d]), n - d);
+        n = n - d;
+    }
+
+    dbg_printf("%lu trailing bytes\n", n);
+}
+
 int
 main(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
 
-    uint8_t msg[1024];
-    for (unsigned i = 0; i < sizeof(msg); i++) { msg[i] = i & 0xFF; }
-    msg[0] = 41;
-    handle_message(msg);
-    msg[0] = 66;
-    handle_message(msg);
-
-#define SHOW(name, size, offset) printf(#name " = %08X\n", data.name);
-    MID41_FIELDS(SHOW);
-    MID66_FIELDS(SHOW);
+    test_from_stdin();
 
     return 0;
 }
