@@ -21,29 +21,19 @@
  */
 
 static void
-be2(uint8_t *b, uint16_t *out)
+be_to_native(uint8_t *in, uint8_t *out, size_t size)
 {
-    *out = ((uint16_t)b[0] << 8) | b[1];
-}
-
-static void
-be4(uint8_t *b, uint32_t *out)
-{
-    uint32_t x = 0;
-    for (int i = 0; i < 4; i++) {
-        x = (x << 8) | b[i];
+    // Compiler will optimize out the endian check
+    int n = 1;
+    if (*(char *)&n == 1) {
+        for (size_t i = 0; i < size; i++) {
+            out[size - i - 1] = in[i];
+        }
+    } else {
+        for (size_t i = 0; i < size; i++) {
+            out[i] = in[i];
+        }
     }
-    *out = x;
-}
-
-static void
-be8(uint8_t *b, uint64_t *out)
-{
-    uint64_t x = 0;
-    for (int i = 0; i < 8; i++) {
-        x = (x << 8) | b[i];
-    }
-    *out = x;
 }
 
 struct gps_data {
@@ -109,20 +99,7 @@ update_gps_data(
         const struct field *f = &(fields[i]);
         uint8_t *b = payload + f->payload_offset;
         uint8_t *dest = (uint8_t *)data + f->struct_offset;
-        switch (f->size) {
-        case 1:
-            *dest = *b;
-            break;
-        case 2:
-            be2(b, (uint16_t *)dest);
-            break;
-        case 4:
-            be4(b, (uint32_t *)dest);
-            break;
-        case 8:
-            be8(b, (uint64_t *)dest);
-            break;
-        }
+        be_to_native(b, dest, f->size);
     }
 }
 
