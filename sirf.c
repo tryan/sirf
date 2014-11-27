@@ -6,12 +6,12 @@
 
 #define ARRAY_LEN(arr) (sizeof(arr) / sizeof(arr[0]))
 
-#ifdef NDEBUG
-#define dbg_puts(...)
-#define dbg_printf(...)
+#if 1
+#define test_puts        puts
+#define test_printf      printf
 #else
-#define dbg_puts        puts
-#define dbg_printf      printf
+#define test_puts(...)
+#define test_printf(...)
 #endif
 
 /*
@@ -148,12 +148,12 @@ static void handle_message(uint8_t *msg)
     switch (mid) {
     case 41:
         update_gps_data(&data, payload, mid41_fields, ARRAY_LEN(mid41_fields));
-        dbg_printf("(%f, %f)\n",
+        test_printf("(%f, %f)\n",
             (double)data.latitude * 1e-7, (double)data.longitude * 1e-7);
         break;
     case 66:
         update_gps_data(&data, payload, mid66_fields, ARRAY_LEN(mid66_fields));
-        dbg_printf("pdop=%u,hdop=%u,vdop=%u\n", data.pdop, data.hdop, data.vdop);
+        test_printf("pdop=%u,hdop=%u,vdop=%u\n", data.pdop, data.hdop, data.vdop);
         break;
     case 6:
         handle_mid6(payload);
@@ -217,7 +217,7 @@ static void test_from_stdin(void)
     size_t n = 0;
     for (;;) {
         n += read(STDIN_FILENO, &(buf[n]), N - n);
-        dbg_printf("\nread %lu bytes\n", n);
+        test_printf("\nread %lu bytes\n", n);
         if (n < 10) {
             break;
         }
@@ -228,13 +228,13 @@ static void test_from_stdin(void)
             dd = scan_bytes( &(buf[d]), n - d );
             d += dd;
         } while (dd > 0);
-        dbg_printf("processed %lu bytes\n", d);
+        test_printf("processed %lu bytes\n", d);
         // (log and) discard processed bytes
         memmove(buf, &(buf[d]), n - d);
         n = n - d;
     }
 
-    dbg_printf("%lu trailing bytes\n", n);
+    test_printf("%lu trailing bytes\n", n);
 }
 
 int
