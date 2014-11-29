@@ -144,21 +144,20 @@ static size_t scan_bytes(uint8_t *buf, size_t n)
         return 0;
     }
 
-    unsigned d, start = UINT_MAX;
+    unsigned d;
     for (d = 0; d < (n - 10); d++) {
         if (buf[d] == 0xA0 && buf[1] == 0xA2) {
-            start = d;
             break;
         }
     }
 
-    if (start == UINT_MAX) {
+    if (buf[d] != 0xA0 || buf[1] != 0xA2) {
         return d;
     }
 
-    uint8_t *frame = &(buf[start]);
+    uint8_t *frame = &(buf[d]);
     unsigned len = ((unsigned)frame[2] << 8) | frame[3];
-    unsigned last = start + len + 7;
+    unsigned last = d + len + 7;
     if (len >= 2048) {
         // Not a valid frame header
         return d + 2;
