@@ -95,9 +95,9 @@ update_gps_data(
 {
     for (unsigned i = 0; i < nfields; i++) {
         const struct field *f = &(fields[i]);
-        uint8_t *b = payload + f->payload_offset;
+        uint8_t *src = payload + f->payload_offset;
         uint8_t *dest = (uint8_t *)data + f->struct_offset;
-        be_to_native(dest, b, f->size);
+        be_to_native(dest, src, f->size);
     }
 }
 
