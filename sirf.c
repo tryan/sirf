@@ -175,7 +175,7 @@ static size_t scan_bytes(uint8_t *buf, size_t n)
         sum += frame[i];
     }
     unsigned recv_xsum = ((unsigned)frame[last - 3] << 8) | frame[last - 2];
-    if ((sum & 0xFFFF) != recv_xsum) {
+    if ((sum & 0x7FFF) != recv_xsum) {
         return d + 2;
     }
 

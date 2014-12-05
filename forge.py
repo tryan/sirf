@@ -8,7 +8,7 @@ def frame(mid, body):
     payload =  chr(mid) + body
     n = len(payload)
     assert(n < (1 << 11))
-    xsum = sum(ord(b) for b in payload) & 0xFFFF
+    xsum = sum(ord(b) for b in payload) & 0x7FFF
     header = '\xA0\xA2' + chr(n >> 8) + chr(n & 0xFF)
     footer = chr(xsum >> 8) + chr(xsum & 0xFF) + '\xB0\xB3'
     return header + payload + footer
