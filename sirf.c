@@ -103,21 +103,6 @@ update_gps_data(
     }
 }
 
-static void handle_mid6(uint8_t *payload)
-{
-    // Version strings are 81 bytes max including NUL
-    static const unsigned N = 81;
-
-    char *sirf = (char *)payload;
-    char *nul = memchr(sirf, '\0', N);
-    if (nul == NULL) {
-        // Message appears to be malformed
-        return;
-    }
-
-    // Check version string(s) and update if necessary
-}
-
 static void handle_message(uint8_t *msg)
 {
     uint8_t mid = msg[0];
@@ -131,9 +116,6 @@ static void handle_message(uint8_t *msg)
     case 66:
         update_gps_data(&data, payload, mid66_fields, ARRAY_LEN(mid66_fields));
         test_printf("pdop=%u,hdop=%u,vdop=%u\n", data.pdop, data.hdop, data.vdop);
-        break;
-    case 6:
-        handle_mid6(payload);
         break;
     }
 }
