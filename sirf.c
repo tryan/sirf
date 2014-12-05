@@ -30,9 +30,7 @@ be_to_native(uint8_t *out, uint8_t *in, size_t size)
             out[size - i - 1] = in[i];
         }
     } else {
-        for (size_t i = 0; i < size; i++) {
-            out[i] = in[i];
-        }
+        memcpy(out, in, size);
     }
 }
 
