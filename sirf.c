@@ -21,7 +21,7 @@
  */
 
 static void
-be_to_native(uint8_t *in, uint8_t *out, size_t size)
+be_to_native(uint8_t *out, uint8_t *in, size_t size)
 {
     // Compiler will optimize out the endian check
     int n = 1;
@@ -99,7 +99,7 @@ update_gps_data(
         const struct field *f = &(fields[i]);
         uint8_t *b = payload + f->payload_offset;
         uint8_t *dest = (uint8_t *)data + f->struct_offset;
-        be_to_native(b, dest, f->size);
+        be_to_native(dest, b, f->size);
     }
 }
 
