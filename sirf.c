@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stddef.h>
@@ -172,7 +173,12 @@ static void test_from_stdin(void)
     uint8_t buf[N];
     size_t n = 0;
     for (;;) {
-        n += read(STDIN_FILENO, &(buf[n]), N - n);
+        ssize_t r = read(STDIN_FILENO, &(buf[n]), N - n);
+        if (r < 0) {
+            fputs("read() error", stderr);
+            exit(1);
+        }
+        n += (size_t)r;
         test_printf("\nread %lu bytes\n", n);
         if (n < 10) {
             break;
