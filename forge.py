@@ -1,6 +1,6 @@
 # Generate known SiRF binary data for testing purposes
 
-import sys, struct, math
+import sys, struct, math, random, os
 
 def nul(n): return chr(0) * n
 
@@ -33,5 +33,7 @@ if __name__ == '__main__':
         lon = -lat
         out.write( mid41(lat, lon) )
         out.write( mid66(n, n + 1, n + 5) )
+        nrand = random.randint(0, 100)
+        out.write(os.urandom(nrand))
     out.write( mid41(200.5, 100.5) )
     out.flush()
