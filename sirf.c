@@ -120,12 +120,12 @@ static size_t scan_bytes(uint8_t *buf, size_t n)
 
     unsigned d;
     for (d = 0; d < (n - 10); d++) {
-        if (buf[d] == 0xA0 && buf[1] == 0xA2) {
+        if (buf[d] == 0xA0 && buf[d + 1] == 0xA2) {
             break;
         }
     }
 
-    if (buf[d] != 0xA0 || buf[1] != 0xA2) {
+    if (buf[d] != 0xA0 || buf[d + 1] != 0xA2) {
         return d;
     }
 
@@ -140,15 +140,15 @@ static size_t scan_bytes(uint8_t *buf, size_t n)
         return d;
     }
 
-    if (frame[last - 1] != 0xB0 || frame[last] != 0xB3) {
+    if (buf[last - 1] != 0xB0 || buf[last] != 0xB3) {
         return d + 2;
     }
 
     unsigned sum = 0;
-    for (unsigned i = 4; i <= (last - 4); i++) {
-        sum += frame[i];
+    for (unsigned i = d + 4; i <= (last - 4); i++) {
+        sum += buf[i];
     }
-    unsigned recv_xsum = ((unsigned)frame[last - 3] << 8) | frame[last - 2];
+    unsigned recv_xsum = ((unsigned)buf[last - 3] << 8) | buf[last - 2];
     if ((sum & 0x7FFF) != recv_xsum) {
         return d + 2;
     }
