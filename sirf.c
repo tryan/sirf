@@ -170,6 +170,8 @@ static void test_from_stdin(void)
         if (r < 0) {
             fputs("read() error", stderr);
             exit(1);
+        } else if (r == 0) {
+            break;
         }
         n += (size_t)r;
         test_printf("\nread %lu bytes\n", n);
