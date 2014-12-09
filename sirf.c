@@ -145,8 +145,8 @@ static size_t scan_bytes(uint8_t *buf, size_t n)
     }
 
     unsigned sum = 0;
-    for (unsigned i = d + 4; i <= (last - 4); i++) {
-        sum += buf[i];
+    for (unsigned i = 0; i < len; i++) {
+        sum += frame[4 + i];
     }
     unsigned recv_xsum = ((unsigned)buf[last - 3] << 8) | buf[last - 2];
     if ((sum & 0x7FFF) != recv_xsum) {
