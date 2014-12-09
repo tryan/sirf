@@ -54,37 +54,30 @@ struct field {
 };
 
 #define DEF_FIELD(name, size, offset) \
-    { (uint8_t)offsetof(struct gps_data, name), offset, size },
-
-//    field name        field size      offset in payload
-#define MID41_FIELDS(X)                     \
-    X(nav_valid,        2,              0)  \
-    X(nav_type,         2,              2)  \
-    X(year,             2,              8)  \
-    X(month,            1,              10) \
-    X(day,              1,              11) \
-    X(hour,             1,              12) \
-    X(minute,           1,              13) \
-    X(second,           2,              14) \
-    X(satellites,       4,              16) \
-    X(latitude,         4,              20) \
-    X(longitude,        4,              24) \
-    X(altitude_ellip,   4,              28) \
-    X(ehpe,             4,              43) \
-    X(evpe,             4,              47) \
-    X(ehve,             4,              55)
+    { (uint8_t)offsetof(struct gps_data, name), offset, size }
 
 static const struct field mid41_fields[] = {
-    MID41_FIELDS(DEF_FIELD)
+    DEF_FIELD(nav_valid,        2,       0),
+    DEF_FIELD(nav_type,         2,       2),
+    DEF_FIELD(year,             2,       8),
+    DEF_FIELD(month,            1,      10),
+    DEF_FIELD(day,              1,      11),
+    DEF_FIELD(hour,             1,      12),
+    DEF_FIELD(minute,           1,      13),
+    DEF_FIELD(second,           2,      14),
+    DEF_FIELD(satellites,       4,      16),
+    DEF_FIELD(latitude,         4,      20),
+    DEF_FIELD(longitude,        4,      24),
+    DEF_FIELD(altitude_ellip,   4,      28),
+    DEF_FIELD(ehpe,             4,      43),
+    DEF_FIELD(evpe,             4,      47),
+    DEF_FIELD(ehve,             4,      55),
 };
 
-#define MID66_FIELDS(X)                     \
-    X(pdop,             2,              6)  \
-    X(hdop,             2,              8)  \
-    X(vdop,             2,             10)
-
 static const struct field mid66_fields[] = {
-    MID66_FIELDS(DEF_FIELD)
+    DEF_FIELD(pdop,     2,      6),
+    DEF_FIELD(hdop,     2,      8),
+    DEF_FIELD(vdop,     2,     10),
 };
 
 static void
