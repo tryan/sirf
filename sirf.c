@@ -132,8 +132,11 @@ static size_t scan_bytes(uint8_t *buf, size_t n)
     uint8_t *frame = &(buf[d]);
     unsigned len = ((unsigned)frame[2] << 8) | frame[3];
     unsigned last = d + len + 7;
-    if (len >= 2048) {
-        // Not a valid frame header
+    if (len > 0xFF) {
+        // SiRF protocol spec allows messages up to 2047 bytes, but the
+        // messages of interest are all much shorter than that. If a long
+        // message comes through, ignore it. The minimum number of bytes that
+        // must be buffered is also reduced by ignoring big messages.
         return d + 2;
     } else if (last >= n) {
         // Don't have the full frame yet
