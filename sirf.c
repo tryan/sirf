@@ -112,7 +112,7 @@ static void handle_message(uint8_t *msg)
     }
 }
 
-static size_t scan_bytes(uint8_t *buf, size_t n)
+static size_t scan(uint8_t *buf, size_t n)
 {
     if (n < 10) {
         return 0;
@@ -185,7 +185,7 @@ static void test_from_stdin(void)
         // Process all the fully received messages
         size_t d = 0, dd;
         do {
-            dd = scan_bytes( &(buf[d]), n - d );
+            dd = scan( &(buf[d]), n - d );
             d += dd;
         } while (dd > 0);
         test_printf("processed %lu bytes\n", d);
