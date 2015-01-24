@@ -5,7 +5,7 @@
 #include <string.h>
 #include <limits.h>
 
-#define ARRAY_LEN(arr) (sizeof(arr) / sizeof(arr[0]))
+#define ARRAY_LEN(arr) (sizeof(arr) / sizeof((arr)[0]))
 
 #if 1
 #define test_puts        puts
