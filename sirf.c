@@ -27,8 +27,9 @@ be_to_native(uint8_t *out, uint8_t *in, size_t size)
     // Compiler will optimize out the endian check
     int n = 1;
     if (*(char *)&n == 1) {
+        uint8_t *p = &(out[size - 1]);
         for (size_t i = 0; i < size; i++) {
-            out[size - i - 1] = in[i];
+            *p-- = in[i];
         }
     } else {
         memcpy(out, in, size);
