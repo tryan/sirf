@@ -5,7 +5,7 @@
 #include <string.h>
 #include <limits.h>
 
-#define ARRAY_LEN(arr) (sizeof(arr) / sizeof(arr[0]))
+#define ARRAY_LEN(arr) (sizeof(arr) / sizeof((arr)[0]))
 
 #if 1
 #define test_puts        puts
@@ -109,6 +109,8 @@ static void handle_message(uint8_t *msg)
     case 66:
         update_gps_data(&data, payload, mid66_fields, ARRAY_LEN(mid66_fields));
         test_printf("pdop=%u,hdop=%u,vdop=%u\n", data.pdop, data.hdop, data.vdop);
+        break;
+    default:
         break;
     }
 }
